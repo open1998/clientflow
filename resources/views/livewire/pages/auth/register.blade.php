@@ -1,9 +1,12 @@
 <?php
 
 use App\Models\User;
+use App\Models\Workspace;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
@@ -30,7 +33,20 @@ new #[Layout('layouts.guest')] class extends Component
 
         event(new Registered($user = User::create($validated)));
 
+        // Create initial workspace for the user
+        $workspace = Workspace::create([
+            'name' => $user->name . "'s Workspace",
+            'slug' => Str::slug($user->name . '-' . Str::random(5)),
+            'owner_id' => $user->id,
+        ]);
+
+        // Link user to workspace as owner
+        $user->workspaces()->attach($workspace->id, ['role' => 'owner']);
+
         Auth::login($user);
+
+        // Store workspace_id in session for multi-tenancy scoping
+        Session::put('workspace_id', $workspace->id);
 
         $this->redirect(route('dashboard', absolute: false), navigate: true);
     }

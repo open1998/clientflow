@@ -5,6 +5,7 @@ namespace App\Livewire\Forms;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
@@ -36,6 +37,14 @@ class LoginForm extends Form
             throw ValidationException::withMessages([
                 'form.email' => trans('auth.failed'),
             ]);
+        }
+
+        // Set default workspace in session
+        $user = Auth::user();
+        $workspace = $user->workspaces()->first();
+
+        if ($workspace) {
+            Session::put('workspace_id', $workspace->id);
         }
 
         RateLimiter::clear($this->throttleKey());
