@@ -9,7 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function run(): void
+    public function up(): void
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->uuid('id')->primary();

@@ -9,10 +9,9 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function run(): void
+    public function up(): void
     {
         Schema::create('workspace_user', function (Blueprint $table) {
-            $table->uuid('id')->primary();
             $table->foreignUuid('workspace_id')->index();
             $table->foreignUuid('user_id')->index();
             $table->string('role')->default('member');
